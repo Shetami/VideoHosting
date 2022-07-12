@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres1
+  web:
+    container_name: video_hosting
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: bash -c "python /usr/src/VideoHosting/manage.py migrate --noinput &&
+             python /usr/src/VideoHosting/manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/usr/src/VideoHosting
+    depends_on:
+      - db
+volumes:
+  postgres_data:
