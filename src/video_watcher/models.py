@@ -5,6 +5,7 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.db.models import Sum
 
 
 class Studio(models.Model):
@@ -46,15 +47,12 @@ class Serial(models.Model):
     description = models.TextField("Description")
     image = models.ImageField("Image serial", upload_to="media/serialImage", blank=True,
                               validators=[FileExtensionValidator(['png', 'jpeg'])])
-    rating_sum = models.DecimalField(max_digits=2, decimal_places=2, default=0.00)
+    rating_sum = models.FloatField(default=0.00)
     date = models.DateField("Date")
     episode_count = models.PositiveSmallIntegerField("Episode count")
     studio = models.ForeignKey(Studio, related_name="serial_studio", on_delete=models.CASCADE)
     day_week = models.PositiveSmallIntegerField(choices=DAY_WEEK)
     genres = models.ManyToManyField(Genres, verbose_name="Genres")
-
-    def get_rating_sum(self):
-        pass
 
     def __str__(self):
         return self.title
@@ -139,8 +137,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Review(models.Model):
     text = models.TextField("Text review", max_length=1024)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    serial = models.OneToOneField(Serial, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    serial = models.ForeignKey(Serial, on_delete=models.CASCADE, related_name="reviews")
+    parent = models.ForeignKey(
+        'self', verbose_name="Parent", on_delete=models.SET_NULL, blank=True, null=True
+    )
+
+    def __str__(self):
+        return f"{self.user.username} - {self.serial.title}"
 
 
 class Rating(models.Model):
@@ -156,6 +160,15 @@ class Rating(models.Model):
         (9, "9"),
         (10, "10")
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    serial = models.ForeignKey(Serial, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="rating_user")
+    serial = models.ForeignKey(Serial, on_delete=models.CASCADE, related_name="rating")
     rate = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
+
+    def get_rating_sum(self, pk):
+        rating_count = self.objects.filter(serial=pk).count()
+        rating_sum = self.objects.filter(serial=pk).aggregate(Sum('rate'))
+        result = rating_sum['rate__sum']/rating_count
+        return result
+
+    def __str__(self):
+        return f"{self.user.username} - {self.serial.title} - {self.rate}"
