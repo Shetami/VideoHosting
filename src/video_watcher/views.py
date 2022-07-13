@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from .models import Serial, Rating
 from .serializers import SerialSerializer, SerialDetailSerializer, SerialReviewSerializer, SerialRatingSerializer
 from .filters import SerialFilter
+from ..utils.calculate_rating import calculate_rating
 
 
 class SerialAPIView(generics.ListAPIView):
@@ -23,13 +24,7 @@ class SerialDetailAPIView(APIView):
 
     def get(self, request, pk):
         serial = Serial.objects.get(id=pk)
-        rating = Rating.objects.filter(serial=pk)
-        rating_count = Rating.objects.filter(serial=pk).count()
-        sum_r = 0
-        for i in rating:
-            sum_r += i.rate
-        sum_r = sum_r/rating_count
-        serial.rating_sum = sum_r
+        serial.rating_sum = calculate_rating(pk)
         serializer = SerialDetailSerializer(serial)
         return Response(serializer.data)
 
@@ -56,4 +51,5 @@ class SerialRatingAPIView(APIView):
             return Response(status=201)
         else:
             return Response(status=400)
+
 
