@@ -8,6 +8,8 @@ SECRET_KEY = 'django-insecure-aru@!fp)ja4hb3k4#e7y+t+qhkyucvm-l26hyye6o(_-co-cw6
 
 DEBUG = True
 
+BASE_BACK_URL = 'http://127.0.0.1:8000'
+
 ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
@@ -17,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'rest_framework',
     'django_filters',
     'drf_yasg',
@@ -26,6 +29,7 @@ INSTALLED_APPS = [
     'djoser',
 
     'src.video_watcher',
+    'src.auth_app',
 ]
 
 MIDDLEWARE = [
@@ -43,7 +47,7 @@ ROOT_URLCONF = 'VideoHosting.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        'DIRS': [os.path.join(BASE_DIR, 'templates')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -75,8 +79,10 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        # 'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
 
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -86,13 +92,21 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 5
 }
 
+#smtp
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'HLoveHosting@gmail.com'
+EMAIL_HOST_PASSWORD = 'swmnuiwbqstfymol'
+EMAIL_PORT = 587
+
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
-    'SERIALIZERS': {
-         'user_create': 'yourapp.serializer.UserRegistrationSerializer'
+    'EMAIL': {
+        'activation': 'src.auth_app.email.CustomActivationEmail',
     }
 }
 
@@ -111,7 +125,7 @@ SIMPLE_JWT = {
     'JWK_URL': None,
     'LEEWAY': 0,
 
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_TYPES': ('JWT',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
@@ -128,7 +142,7 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-AUTH_USER_MODEL = 'video_watcher.User'
+AUTH_USER_MODEL = 'auth_app.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {

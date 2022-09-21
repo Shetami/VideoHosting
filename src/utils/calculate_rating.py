@@ -1,4 +1,4 @@
-from src.video_watcher.models import Rating
+from src.auth_app.models.review_models import Rating
 
 
 def calculate_rating(pk):

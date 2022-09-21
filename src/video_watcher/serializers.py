@@ -1,12 +1,7 @@
 from rest_framework import serializers
-from djoser.serializers import UserCreateSerializer as BaseUserRegistrationSerializer
 
-from .models import Serial, Rating, Review
-
-
-class UserRegistrationSerializer(BaseUserRegistrationSerializer):
-    class Meta(BaseUserRegistrationSerializer.Meta):
-        fields = ('email', 'username', 'password',)
+from .models import Serial
+from src.auth_app.models.review_models import Rating, Review
 
 
 class SerialSerializer(serializers.ModelSerializer):
