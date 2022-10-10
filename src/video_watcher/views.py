@@ -1,3 +1,4 @@
+from django.http import StreamingHttpResponse
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -9,6 +10,7 @@ from .models import Serial
 from .serializers import SerialSerializer, SerialDetailSerializer, SerialReviewSerializer, SerialRatingSerializer
 from .filters import SerialFilter
 from ..utils.calculate_rating import calculate_rating
+from ..utils.open_file import open_file
 
 
 class SerialAPIView(generics.ListAPIView):
@@ -56,3 +58,15 @@ class SerialRatingAPIView(APIView):
             return Response(status=400)
 
 
+class VideoWatcher(APIView):
+    """Video watcher"""
+
+    def get(self, request, pk: int):
+        file, status, content_length, content_range = open_file(request, pk)
+        response = StreamingHttpResponse(file, status=status, content_type='video/mp4')
+
+        response['Accept-Ranges'] = 'bytes'
+        response['Content-Length'] = str(content_length)
+        response['Cache-Control'] = 'no-cache'
+        response['Content-Range'] = content_range
+        return response

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Serial
+from .models import Serial, Video
 from src.auth_app.models.review_models import Rating, Review
 
 
@@ -43,4 +43,12 @@ class SerialDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Serial
+        fields = '__all__'
+
+
+class VideoSerializer(serializers.ModelSerializer):
+    """Video"""
+
+    class Meta:
+        model = Video
         fields = '__all__'

@@ -55,7 +55,7 @@ class Serial(models.Model):
 
 
 class Video(models.Model):
-    video = models.FileField("Video", upload_to="videos", blank=True),
+    video = models.FileField("Video", upload_to="videos", blank=True)
     serials = models.ForeignKey(Serial, related_name="serial_video", on_delete=models.CASCADE)
 
 

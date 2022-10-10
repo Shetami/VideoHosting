@@ -8,4 +8,5 @@ urlpatterns = [
     path("<int:pk>/", views.SerialDetailAPIView.as_view(), name='detail'),
     path("review/", views.SerialReviewAPIView.as_view(), name='review'),
     path("rating/", views.SerialRatingAPIView.as_view(), name='rating'),
+    path("video/<int:pk>/", views.VideoWatcher.as_view(), name='video')
 ]

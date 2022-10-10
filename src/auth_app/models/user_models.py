@@ -46,7 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         },
     )
     image = models.ImageField("Image user", upload_to="media/userImage", blank=True)
-    email = models.EmailField(_("email address"), blank=True)
+    email = models.EmailField(_("email address"), blank=True, unique=True)
     is_staff = models.BooleanField(
         _("staff status"),
         default=False,

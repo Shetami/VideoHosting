@@ -30,6 +30,7 @@ INSTALLED_APPS = [
 
     'src.video_watcher',
     'src.auth_app',
+    'src.videochat'
 ]
 
 MIDDLEWARE = [
@@ -62,6 +63,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'VideoHosting.wsgi.application'
+ASGI_APPLICATION = 'VideoHosting.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 DATABASES = {
     'default': {
